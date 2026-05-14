@@ -1,52 +1,84 @@
 import streamlit as st
 
-st.title("📚 Book Manager App")
+# Заглавие
+st.title("🥗 Скенер за хранителни етикети")
 
-# ------------------ SESSION STATE ------------------
-if "books" not in st.session_state:
-    st.session_state.books = []
+st.write("""
+Това приложение проверява дали дадена съставка е вредна или невредна
+и показва какви здравословни проблеми може да причини.
+""")
 
-# ------------------ ADD BOOK SECTION ------------------
-st.header("➕ Add a New Book")
+# База данни със съставки
+ingredients = {
+    "палмово масло": {
+        "type": "Вредна ❌",
+        "info": "Може да повиши холестерола и риска от сърдечни заболявания.",
+        "alternative": "Използвайте зехтин или слънчогледово масло."
+    },
 
-title = st.text_input("Title")
-author = st.text_input("Author")
+    "глюкозо-фруктозен сироп": {
+        "type": "Вредна ❌",
+        "info": "Повишава риска от диабет и затлъстяване.",
+        "alternative": "Използвайте мед или плодове."
+    },
 
-if st.button("Add Book"):
-    if title.strip() == "" or author.strip() == "":
-        st.warning("Please enter both title and author.")
-    else:
-        book = {
-            "title": title.strip(),
-            "author": author.strip()
-        }
-        st.session_state.books.append(book)
-        st.success("Book added successfully!")
+    "e621": {
+        "type": "Вредна ❌",
+        "info": "Може да причини главоболие и повишен апетит.",
+        "alternative": "Използвайте естествени подправки."
+    },
 
-# ------------------ DISPLAY BOOK LIST ------------------
-st.header("📖 Book List")
+    "консерванти": {
+        "type": "Вредна ❌",
+        "info": "Могат да предизвикат алергии.",
+        "alternative": "Избирайте пресни храни."
+    },
 
-if st.session_state.books:
-    for i, book in enumerate(st.session_state.books, start=1):
-        st.write(f"{i}. {book['title']} by {book['author']}")
-else:
-    st.info("No books added yet.")
+    "какао": {
+        "type": "Невредна ✅",
+        "info": "Съдържа антиоксиданти.",
+        "alternative": "Добра съставка."
+    },
 
-# ------------------ CHECK BOOK SECTION ------------------
-st.header("🔍 Check if a Book Exists")
+    "овес": {
+        "type": "Невредна ✅",
+        "info": "Полезен за храносмилането.",
+        "alternative": "Добър избор."
+    },
 
-search_title = st.text_input("Enter book title to search")
+    "мляко": {
+        "type": "Невредна ✅",
+        "info": "Източник на калций и протеини.",
+        "alternative": "Полезна съставка."
+    }
+}
 
-if st.button("Check Book"):
-    if search_title.strip() == "":
-        st.warning("Please enter a book title.")
-    else:
-        exists = any(
-            book["title"].lower() == search_title.strip().lower()
-            for book in st.session_state.books
-        )
+# Въвеждане на съставка
+ingredient = st.text_input("Въведете съставка:")
 
-        if exists:
-            st.success("The book exists in the database!")
+# Проверка
+if st.button("Провери"):
+    ingredient = ingredient.lower()
+
+    if ingredient in ingredients:
+        st.subheader(f"Съставка: {ingredient}")
+
+        st.write(f"Тип: {ingredients[ingredient]['type']}")
+        st.write(f"Информация: {ingredients[ingredient]['info']}")
+        st.write(f"Алтернатива: {ingredients[ingredient]['alternative']}")
+
+        # Цветно съобщение
+        if "Вредна" in ingredients[ingredient]["type"]:
+            st.error("⚠️ Тази съставка може да бъде вредна.")
         else:
-            st.error("The book is NOT in the database.")
+            st.success("✅ Тази съставка е безопасна.")
+
+    else:
+        st.warning("Няма информация за тази съставка.")
+
+# Списък със съставки
+st.markdown("---")
+st.subheader("📋 Примерни съставки")
+
+for item in ingredients:
+    st.write(f"- {item}")
